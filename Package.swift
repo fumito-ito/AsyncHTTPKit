@@ -3,19 +3,62 @@
 
 import PackageDescription
 
+let packageDependencies: [PackageDescription.Package.Dependency] = {
+    #if os(Linux)
+    [
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.9.0")
+    ]
+    #elseif os(macOS)
+    []
+    #else
+    []
+    #endif
+}()
+
+let targetDependencies: [PackageDescription.Target.Dependency] = {
+    #if os(Linux)
+    [
+        .product(name: "AsyncHTTPClient", package: "async-http-client")
+    ]
+    #elseif os(macOS)
+    []
+    #else
+    []
+    #endif
+}()
+
+let excludes: [String] = {
+    #if os(Linux)
+    [
+        "Implementation/macOS"
+    ]
+    #elseif os(macOS)
+    [
+        "Implementation/linux"
+    ]
+    #else
+    []
+    #endif
+}()
+
 let package = Package(
     name: "AsyncHTTPKit",
+    platforms: [
+        .macOS(.v15),
+        .iOS(.v18)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "AsyncHTTPKit",
             targets: ["AsyncHTTPKit"]),
     ],
+    dependencies: packageDependencies,
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "AsyncHTTPKit"),
+            name: "AsyncHTTPKit",
+            dependencies: targetDependencies,
+            exclude: excludes
+        ),
         .testTarget(
             name: "AsyncHTTPKitTests",
             dependencies: ["AsyncHTTPKit"]
