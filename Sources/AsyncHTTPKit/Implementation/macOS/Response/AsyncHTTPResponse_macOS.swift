@@ -7,9 +7,9 @@
 import Foundation
 
 public extension AsyncHTTPResponse {
-    static func build(from response: URLResponse) -> AsyncHTTPResponse {
+    static func build(from response: URLResponse, for request: AsyncHTTPRequest) throws -> AsyncHTTPResponse {
         guard let response = response as? HTTPURLResponse else {
-            fatalError()
+            throw AsyncHTTPKitError.invalidResponse(response, request: request)
         }
 
         let allHeaderFields = response.allHeaderFields

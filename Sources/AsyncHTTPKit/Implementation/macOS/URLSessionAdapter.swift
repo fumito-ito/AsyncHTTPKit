@@ -18,11 +18,11 @@ public struct URLSessionAdapter: SessionAdapter {
     
     public func data(for request: AsyncHTTPRequest) async throws -> (Data, AsyncHTTPResponse) {
         let (data, response) = try await urlSession.data(for: try request.toURLRequest)
-        return try request.intercept(object: response, data: data, response: AsyncHTTPResponse.build(from: response))
+        return try request.intercept(object: response, data: data, response: try AsyncHTTPResponse.build(from: response, for: request))
     }
     
     public func stream(for request: AsyncHTTPRequest) async throws -> (URLSession.AsyncBytes, AsyncHTTPResponse) {
         let (stream, response) = try await urlSession.bytes(for: try request.toURLRequest)
-        return try request.intercept(object: response, stream: stream, response: AsyncHTTPResponse.build(from: response))
+        return try request.intercept(object: response, stream: stream, response: try AsyncHTTPResponse.build(from: response, for: request))
     }
 }

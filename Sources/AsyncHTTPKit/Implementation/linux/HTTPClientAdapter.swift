@@ -36,9 +36,9 @@ public struct HTTPClientAdapter: SessionAdapter {
 
             task = Task {
                 do {
-                    let request = try request.toHTTPClientRequest
-                    guard let response = try? await client.execute(request, timeout: .seconds(10)) else {
-                        fatalError()
+                    let httpClientRequest = try request.toHTTPClientRequest
+                    guard let response = try? await client.execute(httpClientRequest, timeout: .seconds(10)) else {
+                        throw AsyncHTTPKitError.networkRequestFailed(request: request)
                     }
 
                     for try await buffer in response.body {
@@ -66,7 +66,7 @@ public struct HTTPClientAdapter: SessionAdapter {
         }
 
         guard let (_, reachedResponse) = try await responseStream.first(where: { _ in true }) else {
-            fatalError()
+            throw AsyncHTTPKitError.responseStreamEmpty(request: request)
         }
 
         let (_, response) = try await AsyncHTTPResponse.build(from: reachedResponse)
