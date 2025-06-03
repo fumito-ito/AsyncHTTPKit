@@ -4,18 +4,10 @@
 //
 //  Created by 伊藤史 on 2025/05/28.
 //
-#if os(Linux)
 import Foundation
 import AsyncHTTPClient
 import NIOCore
 import NIOFoundationCompat
-
-private extension ByteBuffer {
-    func getData() -> Data {
-        var buf = self
-        return buf.readData(length: buf.readableBytes) ?? Data()
-    }
-}
 
 public struct AsyncBytes: AsyncSequence {
     public typealias Element = UInt8
@@ -112,4 +104,3 @@ extension AsyncBytes {
         }
     }
 }
-#endif

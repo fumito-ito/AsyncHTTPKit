@@ -9,7 +9,7 @@ import Foundation
 
 /// A protocol that defines the interface for networking adapters in AsyncHTTPKit.
 /// This allows for flexible implementation of different networking backends and easy mocking for testing.
-public protocol SessionAdapter {
+public protocol SessionAdapter: Sendable {
     associatedtype ByteSequence: AsyncSequence<UInt8, Error>
     
     /// Downloads the contents of a URL based on the specified URL request and delivers the data asynchronously.

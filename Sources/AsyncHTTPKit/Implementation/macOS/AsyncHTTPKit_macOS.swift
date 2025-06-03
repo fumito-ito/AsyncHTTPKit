@@ -6,34 +6,9 @@
 //
 import Foundation
 
-extension URLSession: Session {}
-
-extension AsyncHTTPKit {
+extension AsyncHTTPKit where Adapter == URLSessionAdapter {
     /// The shared singleton session object.
-    public static var shared: AsyncHTTPKit {
-        .init(session: URLSession.shared)
-    }
-
-    var urlSession: URLSession? {
-        return session as? URLSession
-    }
-
-    func response(for request: AsyncHTTPRequest) async throws -> (Data, Response) {
-        guard let urlSession else {
-            fatalError()
-        }
-
-        let (data, response) = try await urlSession.data(for: try request.toURLRequest)
-        return try request.intercept(object: response, data: data, response: AsyncHTTPResponse.build(from: response))
-    }
-
-    func stream(for request: AsyncHTTPRequest) async throws -> (some AsyncSequence<UInt8, Error>, AsyncHTTPResponse) {
-        guard let urlSession else {
-            fatalError()
-        }
-
-        let (stream, response) = try await urlSession.bytes(for: try request.toURLRequest)
-
-        return try request.intercept(object: response, stream: stream, response: AsyncHTTPResponse.build(from: response))
+    public static var shared: AsyncHTTPKit<URLSessionAdapter> {
+        .init(adapter: URLSessionAdapter(urlSession: .shared))
     }
 }

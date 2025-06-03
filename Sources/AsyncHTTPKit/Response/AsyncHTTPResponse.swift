@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AsyncHTTPResponse {
+public struct AsyncHTTPResponse: Sendable {
     /// Status code of response
     public let statusCode: Int
 
@@ -15,5 +15,15 @@ public struct AsyncHTTPResponse {
     public let url: URL?
 
     /// Headers for the response
-    public let allHeaderFields: [AnyHashable : Any]
+    public let allHeaderFields: [String : String]
+
+    public init(
+        statusCode: Int,
+        url: URL? = nil,
+        allHeaderFields: [String : String] = [:]
+    ) {
+        self.statusCode = statusCode
+        self.url = url
+        self.allHeaderFields = allHeaderFields
+    }
 }

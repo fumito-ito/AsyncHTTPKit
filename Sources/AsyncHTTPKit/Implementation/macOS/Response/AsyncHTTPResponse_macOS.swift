@@ -12,10 +12,14 @@ public extension AsyncHTTPResponse {
             fatalError()
         }
 
+        let allHeaderFields = response.allHeaderFields
+            .compactMapValues { $0 as? String }
+            .reduce(into: [String: String]()) { dict, pair in dict[pair.key as? String ?? ""] = pair.value }
+
         return .init(
             statusCode: response.statusCode,
             url: response.url,
-            allHeaderFields: response.allHeaderFields
+            allHeaderFields: allHeaderFields
         )
     }
 }
