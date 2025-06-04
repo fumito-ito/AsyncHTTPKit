@@ -1,6 +1,5 @@
 import Testing
 import Foundation
-import AsyncHTTPClient
 @testable import AsyncHTTPKit
 
 @Test("GET request method")

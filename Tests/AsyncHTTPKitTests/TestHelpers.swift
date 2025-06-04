@@ -27,7 +27,10 @@ struct TestRequest: AsyncHTTPRequest {
         self.contentType = contentType
     }
     
-    #if os(macOS)
+    #if os(macOS) || os(iOS)
+    func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+        return request
+    }
     #elseif os(Linux)
     func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
         return request

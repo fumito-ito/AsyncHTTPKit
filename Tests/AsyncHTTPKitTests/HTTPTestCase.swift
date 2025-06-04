@@ -1,6 +1,8 @@
 import Testing
 import Foundation
+#if os(Linux)
 import AsyncHTTPClient
+#endif
 @testable import AsyncHTTPKit
 
 // MARK: - HTTP Test Case DSL

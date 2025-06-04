@@ -1,6 +1,9 @@
 import Testing
 import Foundation
+#if os(macOS)
+#elseif os(Linux)
 import AsyncHTTPClient
+#endif
 @testable import AsyncHTTPKit
 
 @Test("MockSessionAdapter data method basic functionality")
@@ -21,9 +24,15 @@ func mockSessionAdapterDataMethod() async throws {
         var url: URL { URL(string: "https://example.com")! }
         var contentType: String { "application/json" }
 
+        #if os(macOS) || os(iOS)
+        func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+            return request
+        }
+        #elseif os(Linux)
         func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
             return request
         }
+        #endif
     }
     
     let request = TestRequest()
@@ -51,9 +60,15 @@ func mockSessionAdapterStreamMethod() async throws {
         var url: URL { URL(string: "https://example.com")! }
         var contentType: String { "application/json" }
 
+        #if os(macOS) || os(iOS)
+        func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+            return request
+        }
+        #elseif os(Linux)
         func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
             return request
         }
+        #endif
     }
     
     let request = TestRequest()
@@ -82,9 +97,15 @@ func mockSessionAdapterErrorThrowing() async throws {
         var url: URL { URL(string: "https://example.com")! }
         var contentType: String { "application/json" }
 
+        #if os(macOS) || os(iOS)
+        func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+            return request
+        }
+        #elseif os(Linux)
         func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
             return request
         }
+        #endif
     }
     
     let request = TestRequest()

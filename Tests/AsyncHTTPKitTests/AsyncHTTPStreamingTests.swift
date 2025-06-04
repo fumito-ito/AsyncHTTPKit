@@ -1,118 +1,47 @@
 import Testing
 import Foundation
+#if os(macOS)
+#elseif os(Linux)
 import AsyncHTTPClient
+#endif
 @testable import AsyncHTTPKit
 
 @Test("Basic streaming functionality")
 func testBasicStreaming() async throws {
-    let testData = "This is streaming test data".data(using: .utf8)!
-    let mockResponse = AsyncHTTPResponse(
-        statusCode: 200,
-        url: URL(string: "https://example.com"),
-        allHeaderFields: ["Content-Type": "text/plain"]
-    )
-    
-    let adapter = MockSessionAdapter(mockData: testData, mockResponse: mockResponse)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct StreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/stream")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = StreamRequest()
-    let (stream, response) = try await httpKit.bytes(for: request)
-    
-    var receivedData = Data()
-    for try await byte in stream {
-        receivedData.append(byte)
-    }
-    
-    #expect(receivedData == testData)
-    #expect(response.statusCode == 200)
+    try await HTTPTestCase
+        .get("https://example.com/stream")
+        .returningText("This is streaming test data")
+        .returningStatus(200)
+        .returningHeaders(["Content-Type": "text/plain"])
+        .expectingStatus(200)
+        .expectingText("This is streaming test data")
+        .runStream()
 }
 
 @Test("Empty stream")
 func testEmptyStream() async throws {
-    let emptyData = Data()
-    let mockResponse = AsyncHTTPResponse(
-        statusCode: 204,
-        url: URL(string: "https://example.com"),
-        allHeaderFields: [:]
-    )
-    
-    let adapter = MockSessionAdapter(mockData: emptyData, mockResponse: mockResponse)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct EmptyStreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/empty")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = EmptyStreamRequest()
-    let (stream, response) = try await httpKit.bytes(for: request)
-    
-    var receivedData = Data()
-    for try await byte in stream {
-        receivedData.append(byte)
-    }
-    
-    #expect(receivedData.isEmpty)
-    #expect(response.statusCode == 204)
+    try await HTTPTestCase
+        .get("https://example.com/empty")
+        .returningData(Data())
+        .returningStatus(204)
+        .expectingStatus(204)
+        .expectingData(Data())
+        .runStream()
 }
 
 @Test("Large data streaming")
 func testLargeDataStreaming() async throws {
     // Create a large test data (10KB)
-    let largeData = Data(repeating: 0x42, count: 10240)
-    let mockResponse = AsyncHTTPResponse(
-        statusCode: 200,
-        url: URL(string: "https://example.com"),
-        allHeaderFields: ["Content-Length": "10240"]
-    )
+    let largeData = TestData.binary(size: 10240)
     
-    let adapter = MockSessionAdapter(mockData: largeData, mockResponse: mockResponse)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct LargeStreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/large")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = LargeStreamRequest()
-    let (stream, response) = try await httpKit.bytes(for: request)
-    
-    var receivedData = Data()
-    var byteCount = 0
-    for try await byte in stream {
-        receivedData.append(byte)
-        byteCount += 1
-    }
-    
-    #expect(receivedData == largeData)
-    #expect(byteCount == 10240)
-    #expect(response.statusCode == 200)
+    try await HTTPTestCase
+        .get("https://example.com/large")
+        .returningData(largeData)
+        .returningStatus(200)
+        .returningHeaders(["Content-Length": "10240"])
+        .expectingStatus(200)
+        .expectingData(largeData)
+        .runStream()
 }
 
 @Test("Stream with different content types")
@@ -122,103 +51,41 @@ func testStreamWithDifferentContentTypes() async throws {
         "message": "Hello, streaming JSON!",
         "timestamp": "2025-06-04T08:00:00Z"
     }
-    """.data(using: .utf8)!
+    """
     
-    let mockResponse = AsyncHTTPResponse(
-        statusCode: 200,
-        url: URL(string: "https://api.example.com"),
-        allHeaderFields: ["Content-Type": "application/json"]
-    )
-    
-    let adapter = MockSessionAdapter(mockData: jsonData, mockResponse: mockResponse)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct JSONStreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { ["Accept": "application/json"] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://api.example.com/stream")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = JSONStreamRequest()
-    let (stream, response) = try await httpKit.bytes(for: request)
-    
-    var receivedData = Data()
-    for try await byte in stream {
-        receivedData.append(byte)
-    }
-    
-    #expect(receivedData == jsonData)
-    #expect(response.statusCode == 200)
-    #expect(response.allHeaderFields["Content-Type"] == "application/json")
+    try await HTTPTestCase
+        .get("https://api.example.com/stream")
+        .withHeader("Accept", "application/json")
+        .returningJSON(jsonData)
+        .returningStatus(200)
+        .returningHeaders(["Content-Type": "application/json"])
+        .expectingStatus(200)
+        .expectingJSON(jsonData)
+        .expectingHeader("Content-Type", "application/json")
+        .runStream()
 }
 
 @Test("Stream error handling")
 func testStreamErrorHandling() async throws {
     struct StreamError: Error {}
-    let streamError = StreamError()
     
-    let adapter = MockSessionAdapter(mockError: streamError)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct ErrorStreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/error")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = ErrorStreamRequest()
-    
-    await #expect(throws: StreamError.self) {
-        try await httpKit.bytes(for: request)
-    }
+    try await HTTPTestCase
+        .get("https://example.com/error")
+        .returningError(StreamError())
+        .expectingError(StreamError.self)
+        .runStream()
 }
 
 @Test("Stream byte-by-byte reading")
 func testStreamByteByByteReading() async throws {
-    let testBytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F] // "Hello"
-    let testData = Data(testBytes)
-    let mockResponse = AsyncHTTPResponse(
-        statusCode: 200,
-        url: URL(string: "https://example.com"),
-        allHeaderFields: ["Content-Type": "application/octet-stream"]
-    )
+    let testData = TestData.text("Hello")
     
-    let adapter = MockSessionAdapter(mockData: testData, mockResponse: mockResponse)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct ByteStreamRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/bytes")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = ByteStreamRequest()
-    let (stream, response) = try await httpKit.bytes(for: request)
-    
-    var receivedBytes: [UInt8] = []
-    for try await byte in stream {
-        receivedBytes.append(byte)
-    }
-    
-    #expect(receivedBytes == testBytes)
-    #expect(response.statusCode == 200)
-    #expect(String(data: Data(receivedBytes), encoding: .utf8) == "Hello")
+    try await HTTPTestCase
+        .get("https://example.com/bytes")
+        .returningData(testData)
+        .returningStatus(200)
+        .returningHeaders(["Content-Type": "application/octet-stream"])
+        .expectingStatus(200)
+        .expectingData(testData)
+        .runStream()
 }

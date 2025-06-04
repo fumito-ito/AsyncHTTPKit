@@ -1,33 +1,20 @@
 import Testing
 import Foundation
+#if os(macOS)
+#elseif os(Linux)
 import AsyncHTTPClient
+#endif
 @testable import AsyncHTTPKit
 
 @Test("AsyncHTTPKitError.networkRequestFailed")
 func testNetworkRequestFailedError() async throws {
     struct NetworkError: Error {}
-    let networkError = NetworkError()
     
-    let adapter = MockSessionAdapter(mockError: networkError)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct TestRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = TestRequest()
-    
-    await #expect(throws: NetworkError.self) {
-        try await httpKit.data(for: request)
-    }
+    try await HTTPTestCase
+        .get("https://example.com")
+        .returningError(NetworkError())
+        .expectingError(NetworkError.self)
+        .run()
 }
 
 @Test("AsyncHTTPKitError properties and error description")
@@ -39,9 +26,15 @@ func testAsyncHTTPKitErrorProperties() throws {
         var url: URL { URL(string: "https://example.com/test")! }
         var contentType: String { "application/json" }
 
+        #if os(macOS) || os(iOS)
+        func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+            return request
+        }
+        #elseif os(Linux)
         func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
             return request
         }
+        #endif
     }
     
     let request = TestRequest()
@@ -65,55 +58,25 @@ func testErrorThrownDuringDataRequest() async throws {
     struct CustomError: Error, Equatable {
         let message: String
     }
-    let customError = CustomError(message: "Custom network error")
     
-    let adapter = MockSessionAdapter(mockError: customError)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct TestRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .POST }
-        var headers: [String: String] { ["Content-Type": "application/json"] }
-        var body: Data? { "test".data(using: .utf8) }
-        var url: URL { URL(string: "https://api.example.com")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = TestRequest()
-    
-    await #expect(throws: CustomError.self) {
-        try await httpKit.data(for: request)
-    }
+    try await HTTPTestCase
+        .post("https://api.example.com")
+        .withJSONBody("test")
+        .withHeader("Content-Type", "application/json")
+        .returningError(CustomError(message: "Custom network error"))
+        .expectingError(CustomError.self)
+        .run()
 }
 
 @Test("Error thrown during stream request")
 func testErrorThrownDuringStreamRequest() async throws {
     struct StreamError: Error {}
-    let streamError = StreamError()
     
-    let adapter = MockSessionAdapter(mockError: streamError)
-    let httpKit = AsyncHTTPKit(adapter: adapter)
-    
-    struct TestRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com/stream")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = TestRequest()
-    
-    await #expect(throws: StreamError.self) {
-        try await httpKit.bytes(for: request)
-    }
+    try await HTTPTestCase
+        .get("https://example.com/stream")
+        .returningError(StreamError())
+        .expectingError(StreamError.self)
+        .runStream()
 }
 
 @Test("Multiple different error types")
@@ -128,26 +91,11 @@ func testMultipleDifferentErrorTypes() async throws {
         SSLError()
     ]
     
-    struct TestRequest: AsyncHTTPRequest {
-        var method: AsyncHTTPMethod { .GET }
-        var headers: [String: String] { [:] }
-        var body: Data? { nil }
-        var url: URL { URL(string: "https://example.com")! }
-        var contentType: String { "application/json" }
-
-        func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest {
-            return request
-        }
-    }
-    
-    let request = TestRequest()
-    
     for error in errors {
-        let adapter = MockSessionAdapter(mockError: error)
-        let httpKit = AsyncHTTPKit(adapter: adapter)
-        
-        await #expect(throws: (any Error).self) {
-            try await httpKit.data(for: request)
-        }
+        try await HTTPTestCase
+            .get("https://example.com")
+            .returningError(error)
+            .expectingError()
+            .run()
     }
 }
