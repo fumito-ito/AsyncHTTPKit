@@ -7,4 +7,9 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
 
+# Development files
+
+.claude
+.devcontainer
+CLAUDE.md
 Package.resolved
