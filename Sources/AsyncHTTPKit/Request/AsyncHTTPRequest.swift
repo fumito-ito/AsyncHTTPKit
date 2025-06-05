@@ -26,7 +26,7 @@ public protocol AsyncHTTPRequest: Sendable {
     /// Content-Type of request
     var contentType: String { get }
 
-#if os(macOS)
+#if os(macOS) || os(iOS)
     ///
     /// - Parameters:
     ///   - object: Base request object converted to `URLRequest`

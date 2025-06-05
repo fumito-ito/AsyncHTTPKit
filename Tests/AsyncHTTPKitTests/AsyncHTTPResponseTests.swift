@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-#if os(macOS)
+#if os(macOS) || os(iOS)
 #elseif os(Linux)
 import AsyncHTTPClient
 #endif

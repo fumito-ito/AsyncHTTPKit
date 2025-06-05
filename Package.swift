@@ -8,7 +8,7 @@ let packageDependencies: [PackageDescription.Package.Dependency] = {
     [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.9.0")
     ]
-    #elseif os(macOS)
+    #elseif os(macOS) || os(iOS)
     []
     #else
     []
@@ -20,7 +20,7 @@ let targetDependencies: [PackageDescription.Target.Dependency] = {
     [
         .product(name: "AsyncHTTPClient", package: "async-http-client")
     ]
-    #elseif os(macOS)
+    #elseif os(macOS) || os(iOS)
     []
     #else
     []
@@ -32,7 +32,7 @@ let excludes: [String] = {
     [
         "Implementation/macOS"
     ]
-    #elseif os(macOS)
+    #elseif os(macOS) || os(iOS)
     [
         "Implementation/linux"
     ]
