@@ -6,7 +6,7 @@
 //
 
 /// HTTP methods for request.
-public enum AsyncHTTPMethod: String {
+public enum AsyncHTTPMethod: String, Sendable {
     case GET        = "get"
     case POST       = "post"
     case PUT        = "put"
