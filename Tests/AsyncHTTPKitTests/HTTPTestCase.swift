@@ -215,7 +215,7 @@ struct HTTPTestCase {
             }
             
             for (key, expectedValue) in expectedHeaders {
-                let actualValue = response.allHeaderFields[key] as? String
+                let actualValue = response.allHeaderFields[key]
                 #expect(actualValue == expectedValue, 
                        "Expected header \(key) to be '\(expectedValue)', got '\(actualValue ?? "nil")'")
             }
@@ -252,7 +252,7 @@ struct HTTPTestCase {
             }
             
             for (key, expectedValue) in expectedHeaders {
-                let actualValue = response.allHeaderFields[key] as? String
+                let actualValue = response.allHeaderFields[key]
                 #expect(actualValue == expectedValue, 
                        "Expected header \(key) to be '\(expectedValue)', got '\(actualValue ?? "nil")'")
             }
