@@ -9,6 +9,29 @@
 
 AsyncHTTPKit provides a unified HTTP client experience across macOS, iOS, and Linux using the latest Swift concurrency features. Built with the SessionAdapter pattern for maximum flexibility and testability.
 
+## 🎯 Motivation
+
+This library was created to address the limitations of existing Swift HTTP libraries when developing in Dev Container environments on Linux:
+
+**URLSession Limitations on Linux:**
+- Byte streaming APIs are not available on Linux platforms
+- URLProtocol-based testing doesn't work reliably on Linux
+
+**[Alamofire](https://github.com/Alamofire/Alamofire) Linux Challenges:**
+- While Linux-compatible with byte streaming support, it relies on URLProtocol for mocking in tests
+- This dependency causes the same Linux testing issues as URLSession
+
+**[APIKit](https://github.com/ishkawa/APIKit) Compatibility Issues:**
+- Provides excellent URLProtocol-independent testing capabilities
+- However, lacks Linux platform support entirely
+
+**[AsyncHTTPClient](https://github.com/swift-server/async-http-client) Trade-offs:**
+- Full Linux support with robust byte streaming APIs
+- URLProtocol-independent testing architecture
+- But features a unique API interface that differs from Apple ecosystem conventions
+
+AsyncHTTPKit bridges these gaps by providing a familiar, Apple-style API that works seamlessly across all platforms while maintaining excellent testability without URLProtocol dependencies.
+
 ## ✨ Features
 
 - 🚀 **Swift 6.0 native** - Built with modern async/await and Sendable protocols
