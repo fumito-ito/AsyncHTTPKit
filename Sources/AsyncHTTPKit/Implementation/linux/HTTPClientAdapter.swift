@@ -9,21 +9,47 @@ import AsyncHTTPClient
 import NIOCore
 import Foundation
 
+/// Session adapter that uses AsyncHTTPClient for Linux platform.
+///
+/// This adapter provides HTTP functionality on Linux by wrapping
+/// the AsyncHTTPClient library, which is optimized for server-side
+/// Swift applications.
 public struct HTTPClientAdapter: SessionAdapter {
     public typealias ByteSequence = AsyncBytes
     
     private let client: HTTPClient
     
+    /// Creates a new HTTPClientAdapter with the specified HTTPClient.
+    ///
+    /// - Parameter client: The AsyncHTTPClient HTTPClient instance to use
+    ///   for making HTTP requests
     public init(client: HTTPClient) {
         self.client = client
     }
     
+    /// Executes an HTTP request and returns the complete response data.
+    ///
+    /// This method performs the HTTP request using AsyncHTTPClient and
+    /// collects all response data into memory.
+    ///
+    /// - Parameter request: The HTTP request to execute
+    /// - Returns: A tuple containing the response data and response metadata
+    /// - Throws: AsyncHTTPKitError or underlying AsyncHTTPClient errors
     public func data(for request: AsyncHTTPRequest) async throws -> (Data, AsyncHTTPResponse) {
         let httpClientResponse = try await client.execute(request.toHTTPClientRequest, timeout: .seconds(10))
         let (data, response) = try await AsyncHTTPResponse.build(from: httpClientResponse)
         return try request.intercept(object: httpClientResponse, data: data, response: response)
     }
     
+    /// Executes an HTTP request and returns a streaming response.
+    ///
+    /// This method performs the HTTP request using AsyncHTTPClient and
+    /// returns the response body as a stream of bytes, which is memory-efficient
+    /// for large responses.
+    ///
+    /// - Parameter request: The HTTP request to execute
+    /// - Returns: A tuple containing the byte stream and response metadata
+    /// - Throws: AsyncHTTPKitError or underlying AsyncHTTPClient errors
     public func stream(for request: AsyncHTTPRequest) async throws -> (AsyncBytes, AsyncHTTPResponse) {
         var task: Task<Void, Never>?
 
