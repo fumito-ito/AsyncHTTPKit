@@ -66,7 +66,7 @@ Add AsyncHTTPKit to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/your-org/AsyncHTTPKit.git", from: "0.0.1")
+    .package(url: "https://github.com/fumito-ito/AsyncHTTPKit.git", from: "0.0.1")
 ]
 ```
 
