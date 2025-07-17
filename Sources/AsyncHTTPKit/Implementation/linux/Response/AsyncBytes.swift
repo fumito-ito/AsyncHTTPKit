@@ -57,25 +57,33 @@ public struct AsyncBytes: AsyncSequence {
 }
 
 extension AsyncBytes {
-    var lines: LinesCollection {
+    public var lines: LinesCollection {
         return LinesCollection(bytes: self)
     }
-    struct LinesCollection: AsyncSequence {
-        typealias Element = String
+
+    public struct LinesCollection: AsyncSequence {
+        public typealias Element = String
+
         private let bytes: AsyncBytes
+
         init(bytes: AsyncBytes) {
             self.bytes = bytes
         }
-        func makeAsyncIterator() -> LinesIterator {
+
+        public func makeAsyncIterator() -> LinesIterator {
             return LinesIterator(bytes: bytes.makeAsyncIterator())
         }
-        struct LinesIterator: AsyncIteratorProtocol {
+
+        public struct LinesIterator: AsyncIteratorProtocol {
             private var bytesIterator: AsyncBytes.AsyncIterator
+
             private var lineBuffer: [UInt8] = []
+
             init(bytes: AsyncBytes.AsyncIterator) {
                 self.bytesIterator = bytes
             }
-            mutating func next() async throws -> String? {
+
+            public mutating func next() async throws -> String? {
                 while let byte = try await bytesIterator.next() {
                     // 改行文字を見つけたら行を返す
                     if byte == 10 { // LF (Line Feed)
