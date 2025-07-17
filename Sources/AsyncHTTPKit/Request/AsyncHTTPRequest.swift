@@ -117,3 +117,17 @@ public extension AsyncHTTPRequest {
         return (stream, response)
     }
 }
+
+#if os(macOS) || os(iOS)
+public extension AsyncHTTPRequest {
+    func intercept(urlRequest: URLRequest) throws -> URLRequest {
+        urlRequest
+    }
+}
+#elseif os(Linux)
+public extension AsyncHTTPRequest {
+    func intercept(httpClientRequest request: HTTPClientRequest) throws -> HTTPClientRequest {
+        return request
+    }
+}
+#endif
