@@ -8,6 +8,10 @@ import AsyncHTTPClient
 import NIOCore
 
 public extension AsyncHTTPRequest {
+    func intercept(httpClientRequest request: HTTPClientRequest) throws -> HTTPClientRequest {
+        return request
+    }
+
     var toHTTPClientRequest: HTTPClientRequest {
         get throws {
             var request = HTTPClientRequest(url: url.absoluteString)

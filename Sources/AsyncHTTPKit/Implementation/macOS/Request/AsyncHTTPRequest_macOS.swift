@@ -7,6 +7,10 @@
 import Foundation
 
 public extension AsyncHTTPRequest {
+    func intercept(urlRequest: URLRequest) throws -> URLRequest {
+        urlRequest
+    }
+
     var toURLRequest: URLRequest {
         get throws {
             var request = URLRequest(url: url)
