@@ -11,6 +11,10 @@ public extension AsyncHTTPRequest {
         urlRequest
     }
 
+    func intercept(object: AsyncHTTPRequest, request: URLRequest) throws -> URLRequest {
+        request
+    }
+
     var toURLRequest: URLRequest {
         get throws {
             var request = URLRequest(url: url)
