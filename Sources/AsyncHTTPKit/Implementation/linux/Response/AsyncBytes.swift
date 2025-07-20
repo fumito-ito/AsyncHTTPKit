@@ -61,7 +61,7 @@ extension AsyncBytes {
         return LinesCollection(bytes: self)
     }
 
-    public struct LinesCollection: AsyncSequence {
+    public struct LinesCollection: AsyncSequence, Sendable {
         public typealias Element = String
 
         private let bytes: AsyncBytes
