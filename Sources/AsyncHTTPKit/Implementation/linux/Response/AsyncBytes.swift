@@ -9,7 +9,7 @@ import AsyncHTTPClient
 import NIOCore
 import NIOFoundationCompat
 
-public struct AsyncBytes: AsyncSequence {
+public struct AsyncBytes: AsyncSequence, Sendable {
     public typealias Element = UInt8
     public typealias SourceStreamType = AsyncThrowingStream<ByteBuffer, Error>
 
