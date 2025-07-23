@@ -9,7 +9,7 @@ import AsyncHTTPClient
 struct HTTPTestCase {
     private let request: TestRequest
     private let adapter: MockSessionAdapter
-    private let httpKit: AsyncHTTPKit<MockSessionAdapter>
+    private let httpKit: AsyncHTTPKit
     
     private var expectedStatusCode: Int?
     private var expectedData: Data?

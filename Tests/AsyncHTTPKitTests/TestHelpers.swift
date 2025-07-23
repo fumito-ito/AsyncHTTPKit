@@ -259,7 +259,7 @@ enum TestHelpers {
         data: Data = Data(),
         response: AsyncHTTPResponse? = nil,
         error: Error? = nil
-    ) -> AsyncHTTPKit<MockSessionAdapter> {
+    ) -> AsyncHTTPKit {
         let mockResponse = response ?? TestResponseBuilder().build()
         let adapter = MockSessionAdapter(
             mockData: data,
@@ -269,7 +269,7 @@ enum TestHelpers {
         return AsyncHTTPKit(adapter: adapter)
     }
     
-    static func createHTTPKit(adapter: MockSessionAdapter) -> AsyncHTTPKit<MockSessionAdapter> {
+    static func createHTTPKit(adapter: MockSessionAdapter) -> AsyncHTTPKit {
         AsyncHTTPKit(adapter: adapter)
     }
 }

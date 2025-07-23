@@ -9,9 +9,9 @@ import AsyncHTTPClient
 import NIOCore
 import Foundation
 
-extension AsyncHTTPKit where Adapter == HTTPClientAdapter {
+extension AsyncHTTPKit {
     /// The shared singleton session object.
-    public static var shared: AsyncHTTPKit<HTTPClientAdapter> {
+    public static var shared: AsyncHTTPKit {
         .init(adapter: HTTPClientAdapter(client: .shared))
     }
 }
