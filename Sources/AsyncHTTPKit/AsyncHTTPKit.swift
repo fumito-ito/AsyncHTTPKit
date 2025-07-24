@@ -3,14 +3,14 @@
 
 import Foundation
 
-public struct AsyncHTTPKit<Adapter: SessionAdapter> {
+public struct AsyncHTTPKit {
     public typealias Response = AsyncHTTPResponse
 
-    public let adapter: Adapter
-    
+    public let adapter: any SessionAdapter
+
     /// Initializes an AsyncHTTPKit instance with a custom session adapter.
     /// - Parameter adapter: The session adapter to use for network requests
-    public init(adapter: Adapter) {
+    public init(adapter: any SessionAdapter) {
         self.adapter = adapter
     }
     
@@ -24,7 +24,7 @@ public struct AsyncHTTPKit<Adapter: SessionAdapter> {
     /// Retrieves the contents of a URL based on the specified URL request and delivers an asynchronous sequence of bytes.
     /// - Parameter request: A URL request object that provides request-specific information such as the URL and body data.
     /// - Returns: An asynchronously-delivered tuple that contains a `AsyncSequence<UInt8, Error>` sequence to iterate over, and a `AsyncHTTPResponse`.
-    public func bytes(for request: AsyncHTTPRequest) async throws -> (Adapter.ByteSequence, AsyncHTTPResponse) {
+    public func bytes(for request: AsyncHTTPRequest) async throws -> (any AsyncSequence<UInt8, Error>, AsyncHTTPResponse) {
         try await adapter.stream(for: request)
     }
 }

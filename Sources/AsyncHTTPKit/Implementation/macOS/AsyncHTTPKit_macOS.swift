@@ -6,9 +6,9 @@
 //
 import Foundation
 
-extension AsyncHTTPKit where Adapter == URLSessionAdapter {
+extension AsyncHTTPKit {
     /// The shared singleton session object.
-    public static var shared: AsyncHTTPKit<URLSessionAdapter> {
+    public static var shared: AsyncHTTPKit {
         .init(adapter: URLSessionAdapter(urlSession: .shared))
     }
 }
