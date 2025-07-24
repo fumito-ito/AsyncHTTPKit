@@ -17,6 +17,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Set up Homebrew
+      id: set-up-homebrew
+      uses: Homebrew/actions/setup-homebrew@7f6df1cd36597249cbf9810ff3aeff47edf8243b
+
     - name: Install swiftlint
       run: |
         brew update
