@@ -50,7 +50,7 @@ let package = Package(
     products: [
         .library(
             name: "AsyncHTTPKit",
-            targets: ["AsyncHTTPKit"]),
+            targets: ["AsyncHTTPKit"])
     ],
     dependencies: packageDependencies,
     targets: [
@@ -62,6 +62,6 @@ let package = Package(
         .testTarget(
             name: "AsyncHTTPKitTests",
             dependencies: ["AsyncHTTPKit"]
-        ),
+        )
     ]
 )

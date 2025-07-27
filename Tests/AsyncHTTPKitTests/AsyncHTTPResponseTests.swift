@@ -28,7 +28,7 @@ func test201CreatedResponse() async throws {
         "message": "Resource created successfully"
     }
     """
-    
+
     try await HTTPTestCase
         .post("https://api.example.com/resources")
         .withJSONBody("{\"name\": \"Test Resource\"}")
@@ -64,7 +64,7 @@ func test400BadRequestResponse() async throws {
         "message": "Invalid input parameters"
     }
     """
-    
+
     try await HTTPTestCase
         .post("https://api.example.com")
         .withJSONBody("invalid json")
@@ -119,7 +119,7 @@ func testEmptyResponseBody() async throws {
 func testLargeResponseBody() async throws {
     // Create 100KB of test data
     let largeData = TestData.binary(size: 102400, value: 0x41) // 'A' repeated 100KB times
-    
+
     try await HTTPTestCase
         .get("https://example.com/large")
         .returningData(largeData)

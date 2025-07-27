@@ -33,7 +33,7 @@ func testEmptyStream() async throws {
 func testLargeDataStreaming() async throws {
     // Create a large test data (10KB)
     let largeData = TestData.binary(size: 10240)
-    
+
     try await HTTPTestCase
         .get("https://example.com/large")
         .returningData(largeData)
@@ -52,7 +52,7 @@ func testStreamWithDifferentContentTypes() async throws {
         "timestamp": "2025-06-04T08:00:00Z"
     }
     """
-    
+
     try await HTTPTestCase
         .get("https://api.example.com/stream")
         .withHeader("Accept", "application/json")
@@ -68,7 +68,7 @@ func testStreamWithDifferentContentTypes() async throws {
 @Test("Stream error handling")
 func testStreamErrorHandling() async throws {
     struct StreamError: Error {}
-    
+
     try await HTTPTestCase
         .get("https://example.com/error")
         .returningError(StreamError())
@@ -79,7 +79,7 @@ func testStreamErrorHandling() async throws {
 @Test("Stream byte-by-byte reading")
 func testStreamByteByByteReading() async throws {
     let testData = TestData.text("Hello")
-    
+
     try await HTTPTestCase
         .get("https://example.com/bytes")
         .returningData(testData)

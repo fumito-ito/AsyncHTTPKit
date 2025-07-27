@@ -29,7 +29,7 @@ public struct AsyncHTTPResponse: Sendable {
     ///
     /// A dictionary containing all header fields from the response,
     /// such as "Content-Type", "Content-Length", "Cache-Control", etc.
-    public let allHeaderFields: [String : String]
+    public let allHeaderFields: [String: String]
 
     /// Creates a new AsyncHTTPResponse.
     ///
@@ -40,7 +40,7 @@ public struct AsyncHTTPResponse: Sendable {
     public init(
         statusCode: Int,
         url: URL? = nil,
-        allHeaderFields: [String : String] = [:]
+        allHeaderFields: [String: String] = [:]
     ) {
         self.statusCode = statusCode
         self.url = url

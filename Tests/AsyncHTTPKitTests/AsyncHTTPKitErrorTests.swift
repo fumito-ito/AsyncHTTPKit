@@ -9,7 +9,7 @@ import AsyncHTTPClient
 @Test("AsyncHTTPKitError.networkRequestFailed")
 func testNetworkRequestFailedError() async throws {
     struct NetworkError: Error {}
-    
+
     try await HTTPTestCase
         .get("https://example.com")
         .returningError(NetworkError())
@@ -36,9 +36,9 @@ func testAsyncHTTPKitErrorProperties() throws {
         }
         #endif
     }
-    
+
     let request = TestRequest()
-    
+
     // Test networkRequestFailed error
     let networkError = AsyncHTTPKitError.networkRequestFailed(request: request)
     #expect(networkError.failedRequest.url == request.url)
@@ -46,7 +46,7 @@ func testAsyncHTTPKitErrorProperties() throws {
     #expect(networkError.errorDescription?.contains("Network request failed") == true)
     #expect(networkError.errorDescription?.contains("get") == true)
     #expect(networkError.errorDescription?.contains("https://example.com/test") == true)
-    
+
     // Test responseStreamEmpty error
     let streamError = AsyncHTTPKitError.responseStreamEmpty(request: request)
     #expect(streamError.failedRequest.url == request.url)
@@ -58,7 +58,7 @@ func testErrorThrownDuringDataRequest() async throws {
     struct CustomError: Error, Equatable {
         let message: String
     }
-    
+
     try await HTTPTestCase
         .post("https://api.example.com")
         .withJSONBody("test")
@@ -71,7 +71,7 @@ func testErrorThrownDuringDataRequest() async throws {
 @Test("Error thrown during stream request")
 func testErrorThrownDuringStreamRequest() async throws {
     struct StreamError: Error {}
-    
+
     try await HTTPTestCase
         .get("https://example.com/stream")
         .returningError(StreamError())
@@ -84,13 +84,13 @@ func testMultipleDifferentErrorTypes() async throws {
     struct NetworkTimeoutError: Error {}
     struct DNSResolutionError: Error {}
     struct SSLError: Error {}
-    
+
     let errors: [Error] = [
         NetworkTimeoutError(),
         DNSResolutionError(),
         SSLError()
     ]
-    
+
     for error in errors {
         try await HTTPTestCase
             .get("https://example.com")
