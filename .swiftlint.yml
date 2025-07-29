@@ -1,0 +1,15 @@
+included:
+  - Sources
+  - Tests
+  - Package.swift
+excluded:
+  - .build
+  - .github
+  - .swiftpm
+  - Package.resolved
+  - README.md
+  - LICENSE
+  - CHANGELOG.md
+  - CodeOfConduct.md
+  - CONTRIBUTING.md
+  - docs

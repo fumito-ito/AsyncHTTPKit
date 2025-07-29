@@ -21,7 +21,7 @@ public protocol AsyncHTTPRequest: Sendable {
     ///
     /// Specifies the type of HTTP operation to perform (GET, POST, PUT, etc.).
     var method: AsyncHTTPMethod { get }
-    
+
     /// HTTP headers to include with the request.
     ///
     /// A dictionary of header field names and values to be sent with the request.
@@ -34,7 +34,7 @@ public protocol AsyncHTTPRequest: Sendable {
     /// this typically contains the payload (JSON, form data, etc.). For methods
     /// like GET and DELETE, this is usually nil.
     var body: Data? { get }
-    
+
     /// The target URL for the request.
     ///
     /// The complete URL including scheme, host, path, and any query parameters.
@@ -74,7 +74,7 @@ public protocol AsyncHTTPRequest: Sendable {
     /// - Throws: Any error that occurs during request modification
     func intercept(object: AsyncHTTPRequest, request: HTTPClientRequest) throws -> HTTPClientRequest
 #endif
-    
+
     /// Intercepts and modifies the response data and metadata.
     ///
     /// This method allows you to process the response data and headers
@@ -88,7 +88,7 @@ public protocol AsyncHTTPRequest: Sendable {
     /// - Returns: A tuple containing the modified data and response
     /// - Throws: Any error that occurs during response processing
     func intercept(object: Any, data: Data, response: AsyncHTTPResponse) throws -> (Data, AsyncHTTPResponse)
-    
+
     /// Intercepts and modifies the response stream and metadata.
     ///
     /// This method allows you to process the response stream and headers
@@ -101,7 +101,11 @@ public protocol AsyncHTTPRequest: Sendable {
     ///   - response: The AsyncHTTPResponse created from the native response
     /// - Returns: A tuple containing the modified stream and response
     /// - Throws: Any error that occurs during stream processing
-    func intercept<S: AsyncSequence>(object: Any, stream: S, response: AsyncHTTPResponse) throws -> (S, AsyncHTTPResponse) where S.Element == UInt8, S.Failure == Error
+    func intercept<S: AsyncSequence>(
+        object: Any,
+        stream: S,
+        response: AsyncHTTPResponse
+    ) throws -> (S, AsyncHTTPResponse) where S.Element == UInt8, S.Failure == Error
 }
 
 public extension AsyncHTTPRequest {
@@ -113,7 +117,11 @@ public extension AsyncHTTPRequest {
         return (data, response)
     }
 
-    func intercept<S: AsyncSequence>(object: Any, stream: S, response: AsyncHTTPResponse) throws -> (S, AsyncHTTPResponse) where S.Element == UInt8, S.Failure == Error {
+    func intercept<S: AsyncSequence>(
+        object: Any,
+        stream: S,
+        response: AsyncHTTPResponse
+    ) throws -> (S, AsyncHTTPResponse) where S.Element == UInt8, S.Failure == Error {
         return (stream, response)
     }
 }

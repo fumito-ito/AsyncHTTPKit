@@ -62,6 +62,7 @@ extension AsyncBytes {
     }
 
     public struct LinesCollection: AsyncSequence, Sendable {
+        // swiftlint:disable:next nesting
         public typealias Element = String
 
         private let bytes: AsyncBytes
@@ -74,6 +75,7 @@ extension AsyncBytes {
             return LinesIterator(bytes: bytes.makeAsyncIterator())
         }
 
+        // swiftlint:disable:next nesting
         public struct LinesIterator: AsyncIteratorProtocol {
             private var bytesIterator: AsyncBytes.AsyncIterator
 

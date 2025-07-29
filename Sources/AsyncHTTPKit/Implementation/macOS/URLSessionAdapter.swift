@@ -13,9 +13,9 @@ import Foundation
 /// Foundation's URLSession, which is optimized for Apple platforms.
 public struct URLSessionAdapter: SessionAdapter {
     public typealias ByteSequence = URLSession.AsyncBytes
-    
+
     private let urlSession: URLSession
-    
+
     /// Creates a new URLSessionAdapter with the specified URLSession.
     ///
     /// - Parameter urlSession: The Foundation URLSession instance to use
@@ -23,7 +23,7 @@ public struct URLSessionAdapter: SessionAdapter {
     public init(urlSession: URLSession) {
         self.urlSession = urlSession
     }
-    
+
     /// Executes an HTTP request and returns the complete response data.
     ///
     /// This method performs the HTTP request using URLSession and
@@ -34,9 +34,14 @@ public struct URLSessionAdapter: SessionAdapter {
     /// - Throws: AsyncHTTPKitError or underlying URLSession errors
     public func data(for request: AsyncHTTPRequest) async throws -> (Data, AsyncHTTPResponse) {
         let (data, response) = try await urlSession.data(for: try request.toURLRequest)
-        return try request.intercept(object: response, data: data, response: try AsyncHTTPResponse.build(from: response, for: request))
+        return try request
+            .intercept(
+                object: response,
+                data: data,
+                response: try AsyncHTTPResponse.build(from: response, for: request)
+            )
     }
-    
+
     /// Executes an HTTP request and returns a streaming response.
     ///
     /// This method performs the HTTP request using URLSession and
@@ -48,6 +53,11 @@ public struct URLSessionAdapter: SessionAdapter {
     /// - Throws: AsyncHTTPKitError or underlying URLSession errors
     public func stream(for request: AsyncHTTPRequest) async throws -> (URLSession.AsyncBytes, AsyncHTTPResponse) {
         let (stream, response) = try await urlSession.bytes(for: try request.toURLRequest)
-        return try request.intercept(object: response, stream: stream, response: try AsyncHTTPResponse.build(from: response, for: request))
+        return try request
+            .intercept(
+                object: response,
+                stream: stream,
+                response: try AsyncHTTPResponse.build(from: response, for: request)
+            )
     }
 }

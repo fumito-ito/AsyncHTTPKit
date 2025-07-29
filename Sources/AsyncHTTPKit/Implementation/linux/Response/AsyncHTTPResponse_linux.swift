@@ -16,7 +16,7 @@ public extension AsyncHTTPResponse {
             AsyncHTTPResponse(
                 statusCode: Int(response.status.code),
                 url: response.url,
-                allHeaderFields: response.headers.reduce(into: [String:String]()) { $0[$1.name] = $1.value }
+                allHeaderFields: response.headers.reduce(into: [String: String]()) { $0[$1.name] = $1.value }
             )
         )
     }

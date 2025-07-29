@@ -16,9 +16,9 @@ import Foundation
 /// Swift applications.
 public struct HTTPClientAdapter: SessionAdapter {
     public typealias ByteSequence = AsyncBytes
-    
+
     private let client: HTTPClient
-    
+
     /// Creates a new HTTPClientAdapter with the specified HTTPClient.
     ///
     /// - Parameter client: The AsyncHTTPClient HTTPClient instance to use
@@ -26,7 +26,7 @@ public struct HTTPClientAdapter: SessionAdapter {
     public init(client: HTTPClient) {
         self.client = client
     }
-    
+
     /// Executes an HTTP request and returns the complete response data.
     ///
     /// This method performs the HTTP request using AsyncHTTPClient and
@@ -40,7 +40,7 @@ public struct HTTPClientAdapter: SessionAdapter {
         let (data, response) = try await AsyncHTTPResponse.build(from: httpClientResponse)
         return try request.intercept(object: httpClientResponse, data: data, response: response)
     }
-    
+
     /// Executes an HTTP request and returns a streaming response.
     ///
     /// This method performs the HTTP request using AsyncHTTPClient and
@@ -56,7 +56,7 @@ public struct HTTPClientAdapter: SessionAdapter {
         let responseStream = AsyncThrowingStream<(ByteBuffer, HTTPClientResponse), Error> { continuation in
             defer {
                 continuation.finish()
-                let _ = client.shutdown()
+                _ = client.shutdown()
                 task?.cancel()
             }
 
@@ -97,6 +97,11 @@ public struct HTTPClientAdapter: SessionAdapter {
 
         let (_, response) = try await AsyncHTTPResponse.build(from: reachedResponse)
 
-        return try request.intercept(object: reachedResponse, stream: AsyncBytes(stream: bufferStream), response: response)
+        return try request
+            .intercept(
+                object: reachedResponse,
+                stream: AsyncBytes(stream: bufferStream),
+                response: response
+            )
     }
 }
