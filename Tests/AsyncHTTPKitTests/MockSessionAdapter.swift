@@ -8,9 +8,48 @@
 import Foundation
 import AsyncHTTPKit
 
+/// A mock byte sequence that conforms to AsyncByteSequence
+public struct MockByteSequence: AsyncByteSequence {
+    public typealias Element = UInt8
+    public typealias AsyncIterator = MockAsyncIterator
+    
+    private let data: Data
+    
+    public init(data: Data) {
+        self.data = data
+    }
+    
+    public func makeAsyncIterator() -> MockAsyncIterator {
+        return MockAsyncIterator(data: data)
+    }
+}
+
+/// A mock async iterator for byte sequence
+public struct MockAsyncIterator: AsyncIteratorProtocol {
+    public typealias Element = UInt8
+    
+    private let data: Data
+    private var currentIndex: Data.Index
+    
+    public init(data: Data) {
+        self.data = data
+        self.currentIndex = data.startIndex
+    }
+    
+    public mutating func next() async throws -> UInt8? {
+        guard currentIndex < data.endIndex else {
+            return nil
+        }
+        
+        let byte = data[currentIndex]
+        currentIndex = data.index(after: currentIndex)
+        return byte
+    }
+}
+
 /// A mock implementation of SessionAdapter for testing purposes
 public struct MockSessionAdapter: SessionAdapter {
-    public typealias ByteSequence = AsyncThrowingStream<UInt8, Error>
+    public typealias ByteSequence = MockByteSequence
 
     public let mockData: Data
     public let mockResponse: AsyncHTTPResponse
@@ -35,20 +74,12 @@ public struct MockSessionAdapter: SessionAdapter {
 
     public func stream(
         for request: AsyncHTTPRequest
-    ) async throws -> (AsyncThrowingStream<UInt8, Error>, AsyncHTTPResponse) {
+    ) async throws -> (MockByteSequence, AsyncHTTPResponse) {
         if let error = mockError {
             throw error
         }
 
-        let stream = AsyncThrowingStream<UInt8, Error> { continuation in
-            Task {
-                for byte in mockData {
-                    continuation.yield(byte)
-                }
-                continuation.finish()
-            }
-        }
-
-        return (stream, mockResponse)
+        let sequence = MockByteSequence(data: mockData)
+        return (sequence, mockResponse)
     }
 }
