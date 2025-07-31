@@ -22,6 +22,10 @@ public struct MockByteSequence: AsyncByteSequence {
     public func makeAsyncIterator() -> MockAsyncIterator {
         return MockAsyncIterator(data: data)
     }
+    
+    public var byteLines: any AsyncByteLineSequence<MockByteSequence> {
+        return MockLinesCollection(byteSequence: self)
+    }
 }
 
 /// A mock async iterator for byte sequence
@@ -44,6 +48,63 @@ public struct MockAsyncIterator: AsyncIteratorProtocol {
         let byte = data[currentIndex]
         currentIndex = data.index(after: currentIndex)
         return byte
+    }
+}
+
+/// A mock lines collection that conforms to AsyncByteLineSequence
+public struct MockLinesCollection: AsyncByteLineSequence, AsyncSequence, Sendable {
+    public typealias Element = String
+    public typealias Base = MockByteSequence
+    
+    private let byteSequence: MockByteSequence
+    
+    init(byteSequence: MockByteSequence) {
+        self.byteSequence = byteSequence
+    }
+    
+    public func makeAsyncIterator() -> MockLinesIterator {
+        return MockLinesIterator(bytesIterator: byteSequence.makeAsyncIterator())
+    }
+}
+
+/// A mock lines iterator
+public struct MockLinesIterator: AsyncIteratorProtocol {
+    public typealias Element = String
+    
+    private var bytesIterator: MockAsyncIterator
+    private var lineBuffer: [UInt8] = []
+    
+    init(bytesIterator: MockAsyncIterator) {
+        self.bytesIterator = bytesIterator
+    }
+    
+    public mutating func next() async throws -> String? {
+        while let byte = try await bytesIterator.next() {
+            // Check for line feed (LF)
+            if byte == 10 { // LF (Line Feed)
+                // Remove carriage return if present (CRLF support)
+                let line: [UInt8]
+                if lineBuffer.last == 13 { // CR (Carriage Return)
+                    line = Array(lineBuffer.dropLast())
+                } else {
+                    line = lineBuffer
+                }
+                // Reset buffer and return string
+                lineBuffer.removeAll()
+                return String(bytes: line, encoding: .utf8) ?? ""
+            } else {
+                lineBuffer.append(byte)
+            }
+        }
+        
+        // Return remaining content if any
+        if !lineBuffer.isEmpty {
+            let line = lineBuffer
+            lineBuffer.removeAll()
+            return String(bytes: line, encoding: .utf8) ?? ""
+        }
+        
+        return nil
     }
 }
 

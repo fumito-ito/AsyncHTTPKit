@@ -7,5 +7,5 @@
 import Foundation
 
 public protocol AsyncByteSequence: AsyncSequence<UInt8, Error>, Sendable {
-    var lines: AsyncLineSequence<Self> { get }
+    var byteLines: any AsyncByteLineSequence<Self> { get }
 }
