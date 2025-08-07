@@ -30,7 +30,7 @@ public struct AsyncHTTPKit {
     ///            over, and a `AsyncHTTPResponse`.
     public func bytes(
         for request: AsyncHTTPRequest
-    ) async throws -> (any AsyncSequence<UInt8, Error>, AsyncHTTPResponse) {
+    ) async throws -> (any AsyncByteSequence, AsyncHTTPResponse) {
         try await adapter.stream(for: request)
     }
 }

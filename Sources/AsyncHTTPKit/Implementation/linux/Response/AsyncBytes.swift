@@ -61,7 +61,9 @@ extension AsyncBytes {
         return LinesCollection(bytes: self)
     }
 
-    public struct LinesCollection: AsyncSequence, Sendable {
+    public struct LinesCollection: AsyncByteLineSequence, AsyncSequence, Sendable {
+        public typealias Base = AsyncBytes
+
         // swiftlint:disable:next nesting
         public typealias Element = String
 
