@@ -7,11 +7,7 @@
 import Foundation
 
 extension URLSession.AsyncBytes: AsyncByteSequence {
-    public var byteLines: any AsyncByteLineSequence<URLSession.AsyncBytes> {
-        self.lines
+    public var byteLines: AsyncByteLineSequence {
+        AsyncByteLineSequence(self.lines)
     }
-}
-
-extension AsyncLineSequence: AsyncByteLineSequence {
-    public typealias Base = URLSession.AsyncBytes
 }

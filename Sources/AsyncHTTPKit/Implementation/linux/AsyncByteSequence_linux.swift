@@ -6,7 +6,7 @@
 //
 
 extension AsyncBytes: AsyncByteSequence {
-    public var byteLines: any AsyncByteLineSequence<AsyncBytes> {
-        self.lines
+    public var byteLines: AsyncByteLineSequence {
+        AsyncByteLineSequence(self.lines)
     }
 }

@@ -22,9 +22,9 @@ public struct MockByteSequence: AsyncByteSequence {
     public func makeAsyncIterator() -> MockAsyncIterator {
         return MockAsyncIterator(data: data)
     }
-    
-    public var byteLines: any AsyncByteLineSequence<MockByteSequence> {
-        return MockLinesCollection(byteSequence: self)
+
+    public var byteLines: AsyncByteLineSequence {
+        AsyncByteLineSequence(MockLinesCollection(byteSequence: self))
     }
 }
 
@@ -52,7 +52,7 @@ public struct MockAsyncIterator: AsyncIteratorProtocol {
 }
 
 /// A mock lines collection that conforms to AsyncByteLineSequence
-public struct MockLinesCollection: AsyncByteLineSequence, AsyncSequence, Sendable {
+public struct MockLinesCollection: AsyncSequence, Sendable {
     public typealias Element = String
     public typealias Base = MockByteSequence
     
