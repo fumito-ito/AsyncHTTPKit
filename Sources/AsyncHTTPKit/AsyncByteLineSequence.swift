@@ -10,7 +10,7 @@ public struct AsyncByteLineSequence: AsyncSequence, Sendable {
     
     private let _makeAsyncIterator: @Sendable () -> AsyncIterator
     
-    public init<Wrapped: AsyncSequence>(_ wrapped: Wrapped) where Wrapped.Element == String, Wrapped: Sendable {
+    public init<Wrapped: AsyncSequence>(_ wrapped: Wrapped) where Wrapped.Element == String, Wrapped.Failure == any Error, Wrapped: Sendable {
         self._makeAsyncIterator = { AsyncIterator(wrapped.makeAsyncIterator()) }
     }
     
@@ -19,14 +19,14 @@ public struct AsyncByteLineSequence: AsyncSequence, Sendable {
     }
     
     public struct AsyncIterator: AsyncIteratorProtocol {
-        private var wrappedIterator: any AsyncIteratorProtocol
-        
-        init<Wrapped: AsyncIteratorProtocol>(_ wrapped: Wrapped) where Wrapped.Element == String {
+        private var wrappedIterator: any AsyncIteratorProtocol<String, any Error>
+
+        init<Wrapped: AsyncIteratorProtocol>(_ wrapped: Wrapped) where Wrapped.Element == String, Wrapped.Failure == any Error {
             self.wrappedIterator = wrapped
         }
         
         public mutating func next() async throws -> String? {
-            try await wrappedIterator.next() as? String
+            try await wrappedIterator.next()
         }
     }
 }
